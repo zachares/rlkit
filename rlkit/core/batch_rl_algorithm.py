@@ -1,4 +1,5 @@
 import abc
+import numpy as np
 
 import gtimer as gt
 from rlkit.core.rl_algorithm import BaseRLAlgorithm
@@ -54,7 +55,11 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
         for epoch in gt.timed_for(
                 range(self._start_epoch, self.num_epochs),
                 save_itrs=True,
-        ):
+        ):  
+            self.eval_env.epoch = np.array([epoch])
+            self.expl_env.epoch = np.array([epoch])
+
+            print("\nCollecting Eval Trajectories\n")
             self.eval_data_collector.collect_new_paths(
                 self.max_path_length,
                 self.num_eval_steps_per_epoch,
@@ -62,6 +67,7 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
             )
             gt.stamp('evaluation sampling')
 
+            print("\nCollecting Training Trajectories\n")
             for _ in range(self.num_train_loops_per_epoch):
                 new_expl_paths = self.expl_data_collector.collect_new_paths(
                     self.max_path_length,
