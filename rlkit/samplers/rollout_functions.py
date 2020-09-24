@@ -123,6 +123,7 @@ def rollout(
         env_infos.append(env_info)
         path_length += 1
         if d:
+            print("Happened in RLkits")
             break
         o = next_o
     actions = np.array(actions)
